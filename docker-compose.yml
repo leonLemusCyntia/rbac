@@ -1,0 +1,53 @@
+name: arkham
+
+services:
+  rbac:
+    build:
+      context: ./rbac
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      db:
+        condition: service_started
+    volumes:
+      - .:/rbac
+    environment:
+      FLASK_DEBUG: 1
+      DATABASE_URL: postgresql+asyncpg://admin:admin@db:5432/rbac
+    command: flask --app ./app run -h 0.0.0.0 -p 3000
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./rbac
+          target: /src/rbac
+  payments:
+    build:
+      context: ./payments
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    depends_on:
+      rbac:
+        condition: service_started
+    volumes:
+      - .:/payments
+    environment:
+      FLASK_DEBUG: 1
+    command: flask --app ./app run -h 0.0.0.0 -p 3001
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: rbac
+    expose:
+      - 5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  adminer:
+    image: adminer
+    ports:
+     - 8080:8080
+volumes:
+  db_data:

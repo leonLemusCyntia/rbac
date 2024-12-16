@@ -26,7 +26,10 @@ def payments():
         
 
 def get_rbac_auth(user_id, permission):
-    return requests.get("http://rbac:3000/rbac-auth", params={"user_id": user_id, "permission": permission}).status_code
+    return requests.get(
+        "http://rbac:3000/rbac-auth",
+        params={"user_id": user_id, "permission": permission}
+    ).status_code
 
 
    

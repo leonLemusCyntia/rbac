@@ -50,12 +50,10 @@ def home():
 
 @app.route("/rbac-auth", methods=["GET"])
 def get_rbac_auth():
-    # TOdo, VALIDATE input
-
     user_id = int(request.args["user_id"])
     permission = request.args["permission"]
-    user = db.session.query(User).filter(User.id == user_id).first()
-    permission = db.session.query(Permission).filter(Permission.name == permission).first()
+    user = db.session.query(User).filter(User.id == user_id).first_or_404()
+    permission = db.session.query(Permission).filter(Permission.name == permission).first_or_404()
     grant_permission = db.session.query(
         Role_Permission_Relationship
     ).filter(
